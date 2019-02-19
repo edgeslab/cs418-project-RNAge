@@ -4,9 +4,8 @@
 import pandas as pd
 import numpy as np
 import sys
-print(sys.version)
-
+from pathlib import Path
+def main():
+    pass
 if __name__ == '__main__':
-	
-	pass
-
+    main()
