@@ -10,19 +10,36 @@ class expressionData():
         
         """
         self.rawCounts=self.readRawCounts(data_dir/manifest["data"])
+        self.subjMeta=self.readMeta(data_dir/manifest["subject_meta"])
         self.sampleMeta=self.readMeta(data_dir/manifest["sample_meta"])
-        self.sampleMeta=self.inputMeta()
-    def inputMeta(self):
+        self.sampleMeta=self.orderMeta()
+        self.sampleMeta=self.mergeSubjSamp()
+    def orderMeta(self):
         """"
         This function reads, removes, and orders metadata entries to align with the rawcounts matrix
         Input:
             self
         Output:
-            Modified self.sampleMeta
+            DataFrame of ordered sample metadata
         """
         SAMPID_DataFrame=pd.DataFrame({'SAMPID':pd.Series(self.rawCounts.index)})
         meta=SAMPID_DataFrame.merge(self.sampleMeta,how='left',on='SAMPID').set_index('SAMPID')
+        print("Trimmed and Ordered metadata to dimensions: ",meta.shape)
         return meta
+    def mergeSubjSamp(self):
+        """
+        This function parses the index of samples to get the subject prefix. Then the subject metadata is merged with the sample metadataw.
+        Input:
+            self.sampleMeta
+            self.subjMeta
+        Output:
+            Dataframe of ordered sample metadata.
+        """
+        meta=self.subjMeta
+        SAMPmeta=self.sampleMeta
+        SAMPmeta['SUBJID']=pd.Series(SAMPmeta.index,index=SAMPmeta.index).str.rsplit('-',n=3).str.get(0)
+        SAMPmeta=SAMPmeta.merge(meta,on="SUBJID",how="left")
+        return SAMPmeta
     def readMeta(self,data_path):
         """
         This function reads raw GTEx metadata file in a tsv format.
@@ -32,7 +49,6 @@ class expressionData():
             Pandas dataframe of sample metadata.
         """
         data=pd.read_csv(data_path,sep="\t")
-        #self.sampleMeta=data
         print("Imported metadata of dimensions",data.shape)
         return data
     def readRawCounts(self,data_path):
