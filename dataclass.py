@@ -23,7 +23,7 @@ class expressionData():
             DataFrame of ordered sample metadata
         """
         SAMPID_DataFrame=pd.DataFrame({'SAMPID':pd.Series(self.rawCounts.index)})
-        meta=SAMPID_DataFrame.merge(self.sampleMeta,how='left',on='SAMPID').set_index('SAMPID')
+        meta=SAMPID_DataFrame.merge(self.sampleMeta,how='left',on='SAMPID')
         print("Trimmed and Ordered metadata to dimensions: ",meta.shape)
         return meta
     def mergeSubjSamp(self):
@@ -65,7 +65,7 @@ class expressionData():
 def main():
     pass
 if __name__ == '__main__':
-    data_dir=Path("/home/imlay/storage/GTEx/data")
+    data_dir=Path("data")
     
     
     manifest={"data":"All_Tissue_Site_Details.combined.reads.gct",
