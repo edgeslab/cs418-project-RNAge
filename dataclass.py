@@ -43,14 +43,14 @@ class expressionData():
         Output:
             Pandas dataframe with integer count matrix and multiindex.
         """
-        data=pd.read_csv(data_path,sep="\t",skiprows=2,index_col=[0,1])
+        data=pd.read_csv(data_path,sep="\t",skiprows=2,index_col=[0,1], encoding="cp1252")
         #self.rawCounts=data.T
         print("Imported raw count data of dimensions",data.T.shape)
         return data.T
 def main():
     pass
 if __name__ == '__main__':
-    data_dir=Path("D:\GTEx\data")
+    data_dir=Path("D:\Github\cs418-project-RNAge\data")
     
     
     manifest={"data":"All_Tissue_Site_Details.combined.reads.gct",
