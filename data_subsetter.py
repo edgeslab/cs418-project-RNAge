@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # Benjamin Imlay
 import pandas as pd
+from libpath import Path
 def GTEx_shrinker(counts,meta,by_col,n=20):
     by=meta[by_col].unique()
     ans=[]
@@ -18,6 +19,7 @@ def GTEx_shrinker(counts,meta,by_col,n=20):
     return selectedCounts,selectedMeta
 if __name__ == '__main__':
     #filteredData=copy.deepcopy(data)
+    data_dir=Path("data")
     x,y=GTEx_shrinker(data.rawCounts,data.sampleMeta,'SMTS',20)
-    x.to_csv("filteredData.tsv",sep="\t")
-    y.to_csv("filteredMeta.tsv",sep="\t")
+    x.to_csv(data/"filteredData.tsv",sep="\t")
+    y.to_csv(data/"filteredMeta.tsv",sep="\t")

@@ -23,7 +23,7 @@ class expressionData():
             DataFrame of ordered sample metadata
         """
         SAMPID_DataFrame=pd.DataFrame({'SAMPID':pd.Series(self.rawCounts.index)})
-        meta=SAMPID_DataFrame.merge(self.sampleMeta,how='left',on='SAMPID').set_index('SAMPID')
+        meta=SAMPID_DataFrame.merge(self.sampleMeta,how='left',on='SAMPID')
         print("Trimmed and Ordered metadata to dimensions: ",meta.shape)
         return meta
     def mergeSubjSamp(self):
@@ -66,7 +66,9 @@ class expressionData():
 def main():
     pass
 if __name__ == '__main__':
+
     data_dir=Path("D:\Github\cs418-project-RNAge\data")
+
     
     
     manifest={"data":"All_Tissue_Site_Details.combined.reads.gct",
@@ -74,4 +76,8 @@ if __name__ == '__main__':
               "subject_meta":"GTEx_v7_Annotations_SubjectPhenotypesDS.txt"}
     data=expressionData(data_dir,manifest)
 
+
 #Testing branch sanity
+
+    data.sampleMeta.to_csv(data_dir/"merged_meta.tsv",sep="\t")
+
