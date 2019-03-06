@@ -1,9 +1,6 @@
-library(DESeq2)
-library(BiocParallel)
 library(edgeR)
 library(limma)
-library(factoextra)
-#register(MulticoreParam(1))
+
 ### common functions
 nsv_filter<-function(counts,verbose=FALSE) {
   if(verbose) {
@@ -53,6 +50,12 @@ plotmanual <- function(data, grp, title = NULL) {
     p + geom_point() + theme + xlab(percentage[1]) + ylab(percentage[2]) + labs(title = title, subtitle = "lcpm;n=500")
   return(p)
 }
+metaBar<-function(meta,by_col,mar=c(5,8,4,2),main=FALSE) {
+  if(!(main)) main=by_col
+  par(las=2)
+  par(mar=mar)
+  barplot(table(meta[[by_col]])[order(table(meta[[by_col]]))],main=main,horiz=TRUE)
+}
 get_PCAmat<-function(lcpm) {
   #mat will need to be horizontal.
   ntop <- 500
@@ -64,33 +67,34 @@ get_PCAmat<-function(lcpm) {
 
 ### parameters
 nCore<-32
-dir<-"/home/imlay/storage/GTEx/data/"
+root_dir<-"/home/imlay/storage/cs418-project-RNAge/"
+data_dir<-"/home/imlay/storage/cs418-project-RNAge/data"
 ### loading data
-setwd(dir)
-meta<-read.table("GTEx_v7_Annotations_SubjectPhenotypesDS.txt",sep="\t",header = TRUE,na.strings = "na")
-meta2<-data.table::fread("merged_meta.tsv",sep="\t",nThread=nCore)
+setwd(data_dir)
+meta<-data.table::fread("merged_meta.tsv",sep="\t",header=TRUE,na.strings="na",nThread=nCore)
 counts<-data.table::fread("All_Tissue_Site_Details.combined.reads.gct",nThread=nCore)
+setwd(root_dir)
 ### process data and metadata
 counts<-get_counts(counts)
-meta2<-meta2[meta2$SAMPID %in% rownames(mat_counts),]
-meta2<-meta2[order(match(meta2$SAMPID,dimnames(mat_counts)[[1]])),] #orders runs in meta with the raw data
-rownames(meta2)<-meta2$SAMPID
-meta2<-meta2[,c("SAMPID","SMTS")]
-meta2$SMTS<-factor(meta2$SMTS)
-
-## EDA
-metaBar<-function(meta) {
-  par(las=2)
-  par(mar=c(5,8,4,2))
-  barplot(table(meta2$SMTS)[order(table(meta2$SMTS))],main="Tissues",horiz=TRUE)
-}
-
-x<-DGEList(t(counts),samples=merged_meta)
+rownames(meta)<-meta$SAMPID
+### edgeR pre-processing
+x<-DGEList(t(counts),samples=meta)
 x <- calcNormFactors(x, method = "TMM")
 cpm<-cpm(x)
 lcpm<-cpm(x,log=TRUE)
 
+## EDA
+png(file.path(root_dir,"plots","tissue_BAR.png"))
+metaBar(meta,"SMTS")
+dev.off()
+png(file.path(root_dir,"plots","age_BAR.png"))
+metaBar(meta,"AGE")
+dev.off()
 
 mat<-get_PCAmat(lcpm)
-plotmanual(t(mat),meta$p_class,title="All samples")
-ggsave(file.path(rootdir,"plots","PCA.png"))
+plotmanual(t(mat),meta$AGE,title="All samples")
+ggsave(file.path(root_dir,"plots","All_age_PCA.png"))
+
+mat<-get_PCAmat(lcpm[,meta[meta$SMTS=="Esophagus"]$SAMPID])
+plotmanual(t(mat),meta$SMTSD,title="Esophagus")
+ggsave(file.path(root_dir,"plots","Esophagus_PCA.png"))

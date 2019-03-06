@@ -3,7 +3,7 @@
 # Benjamin Imlay
 import pandas as pd
 from pathlib import Path
-class expressionData():
+class rawExpressionData():
     def __init__(self,data_dir,manifest):
         """
         The constructor expects the data dir of type Path from pathlib, a manifest dictionary with data, sample_meta, and subject_meta.
@@ -62,8 +62,6 @@ class expressionData():
         data=pd.read_csv(data_path,sep="\t",skiprows=2,index_col=[0,1])
         print("Imported raw count data of dimensions",data.T.shape)
         return data.T
-def main():
-    pass
 if __name__ == '__main__':
     data_dir=Path("data")
     
