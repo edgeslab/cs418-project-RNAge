@@ -78,10 +78,10 @@ setwd(root_dir)
 counts<-get_counts(counts)
 rownames(meta)<-meta$SAMPID
 ### edgeR pre-processing
-x<-DGEList(t(counts),samples=meta)
-x <- calcNormFactors(x, method = "TMM")
-cpm<-cpm(x)
-lcpm<-cpm(x,log=TRUE)
+counts<-DGEList(t(counts),samples=meta)
+counts <- calcNormFactors(x, method = "TMM")
+#cpm<-cpm(x)
+lcpm<-cpm(counts,log=TRUE)
 
 ## EDA
 png(file.path(root_dir,"plots","tissue_BAR.png"))
@@ -95,6 +95,6 @@ mat<-get_PCAmat(lcpm)
 plotmanual(t(mat),meta$AGE,title="All samples")
 ggsave(file.path(root_dir,"plots","All_age_PCA.png"))
 
-mat<-get_PCAmat(lcpm[,meta[meta$SMTS=="Esophagus"]$SAMPID])
-plotmanual(t(mat),meta$SMTSD,title="Esophagus")
+mat<-get_PCAmat(lcpm[,meta[meta$SMTS=="Esophagus",]$SAMPID])
+plotmanual(t(mat),meta[meta$SMTS=="Esophagus",]$SMTSD,title="Esophagus")
 ggsave(file.path(root_dir,"plots","Esophagus_PCA.png"))

@@ -37,7 +37,7 @@ class rawExpressionData():
         """
         meta=self.subjMeta
         SAMPmeta=self.sampleMeta
-        SAMPmeta['SUBJID']=pd.Series(SAMPmeta.index,index=SAMPmeta.index).str.rsplit('-',n=3).str.get(0)
+        SAMPmeta['SUBJID']=pd.Series(SAMPmeta['SAMPID'],index=SAMPmeta['SAMPID']).str.rsplit('-',n=3).str.get(0)
         SAMPmeta=SAMPmeta.merge(meta,on="SUBJID",how="left")
         return SAMPmeta
     def readMeta(self,data_path):
@@ -69,5 +69,5 @@ if __name__ == '__main__':
     manifest={"data":"All_Tissue_Site_Details.combined.reads.gct",
               "sample_meta":"GTEx_v7_Annotations_SampleAttributesDS.txt",
               "subject_meta":"GTEx_v7_Annotations_SubjectPhenotypesDS.txt"}
-    data=expressionData(data_dir,manifest)
+    data=rawExpressionData(data_dir,manifest)
     data.sampleMeta.to_csv(data_dir/"merged_meta.tsv",sep="\t")
