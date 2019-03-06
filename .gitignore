@@ -3,3 +3,4 @@ template.py
 *.gz
 *DS.txt
 data/
+._.DS_Store

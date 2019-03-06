@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 # Benjamin Imlay
 import pandas as pd
-from libpath import Path
-def GTEx_shrinker(counts,meta,by_col,n=20):
+from pathlib import Path
+def GTEx_sample_shrinker(meta,by_col,n=20):
     by=meta[by_col].unique()
     ans=[]
     for i in by:
@@ -12,14 +12,14 @@ def GTEx_shrinker(counts,meta,by_col,n=20):
             nn=nTissue
         else:
             nn=n
-        ans.append(meta[meta[by_col]==i].sample(nn))
-    print(ans)
+        ans.append(meta[meta[by_col]==i].sample(nn)['SAMPID'])
     selectedMeta=pd.concat(ans)
-    selectedCounts=counts.iloc[selectedMeta.index,:]
-    return selectedCounts,selectedMeta
+    return selectedMeta
 if __name__ == '__main__':
-    #filteredData=copy.deepcopy(data)
     data_dir=Path("data")
-    x,y=GTEx_shrinker(data.rawCounts,data.sampleMeta,'SMTS',20)
-    x.to_csv(data/"filteredData.tsv",sep="\t")
-    y.to_csv(data/"filteredMeta.tsv",sep="\t")
+    manifest={"data":"All_Tissue_Site_Details.combined.reads.gct",
+              "sample_meta":"GTEx_v7_Annotations_SampleAttributesDS.txt",
+              "subject_meta":"GTEx_v7_Annotations_SubjectPhenotypesDS.txt"}
+    meta=pd.read_csv(data_dir/manifest['sample_meta'],sep="\t")
+    y=GTEx_sample_shrinker(meta,'SMTS',20)
+    y.to_csv(data_dir/"filteredSAMPID.tsv",sep="\t",index=False)
