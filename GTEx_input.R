@@ -20,7 +20,7 @@ get_counts<-function(raw_frame) {
   return(t(counts))
 }
 
-plotmanual <- function(data, grp, title = NULL) {
+plotmanual <- function(data, grp, title = NULL,alpha=.9,subtitle="lcpm;n=500") {
   res.pca <- prcomp(data, scale. = TRUE, center = TRUE)
   res.df <- as.data.frame(res.pca$x)
   percentage <-
@@ -43,11 +43,10 @@ plotmanual <- function(data, grp, title = NULL) {
   p <- ggplot(res.df, aes(
     x = PC1,
     y = PC2,
-    color = grp,
-    alpha = .8
+    color = grp
   ))
   p <-
-    p + geom_point() + theme + xlab(percentage[1]) + ylab(percentage[2]) + labs(title = title, subtitle = "lcpm;n=500")
+    p + geom_point(alpha=alpha) + theme + xlab(percentage[1]) + ylab(percentage[2]) + labs(title = title, subtitle = subtitle)
   return(p)
 }
 metaBar<-function(meta,by_col,mar=c(5,8,4,2),main=FALSE) {
@@ -64,16 +63,23 @@ get_PCAmat<-function(lcpm) {
   mat <- lcpm[select, ]
   return(mat)
 }
-
+tissuePCA<-function(lcpm,meta,tissue,grp) {
+  sel<-meta[SMTS==tissue]
+  mat<-get_PCAmat(lcpm[,sel$SAMPID])
+  plotmanual(t(mat),sel[[grp]],title=tissue,subtitle=paste0("lcpm ; n=",nrow(sel)))
+  ggsave(file.path(root_dir,"plots",paste0(tissue,"_",grp,"_PCA.png")),width = 8,height=8)
+}
 ### parameters
 nCore<-32
 root_dir<-"/home/imlay/storage/cs418-project-RNAge/"
 data_dir<-"/home/imlay/storage/cs418-project-RNAge/data"
+
 ### loading data
 setwd(data_dir)
 meta<-data.table::fread("merged_meta.tsv",sep="\t",header=TRUE,na.strings="na",nThread=nCore)
 counts<-data.table::fread("All_Tissue_Site_Details.combined.reads.gct",nThread=nCore)
 setwd(root_dir)
+
 ### process data and metadata
 counts<-get_counts(counts)
 rownames(meta)<-meta$SAMPID
@@ -95,6 +101,12 @@ mat<-get_PCAmat(lcpm)
 plotmanual(t(mat),meta$AGE,title="All samples")
 ggsave(file.path(root_dir,"plots","All_age_PCA.png"))
 
-mat<-get_PCAmat(lcpm[,meta[meta$SMTS=="Esophagus",]$SAMPID])
-plotmanual(t(mat),meta[meta$SMTS=="Esophagus",]$SMTSD,title="Esophagus")
-ggsave(file.path(root_dir,"plots","Esophagus_PCA.png"))
+for(t in unique(meta$SMTS)){
+  tissuePCA(lcpm,meta,t,"SMTSD")
+}
+
+
+## Optional saving of pre-processed matrices
+#tlcpm<-data.table(t(lcpm))
+#rownames(tlcpm)<-dimnames(lcpm)[[2]]
+#data.table::fwrite(tlcpm,file = file.path(data_dir,"lcpm.tsv"),sep = "\t",row.names = True,nThread = nCore)

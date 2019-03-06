@@ -19,7 +19,8 @@ if __name__ == '__main__':
     data_dir=Path("data")
     manifest={"data":"All_Tissue_Site_Details.combined.reads.gct",
               "sample_meta":"GTEx_v7_Annotations_SampleAttributesDS.txt",
-              "subject_meta":"GTEx_v7_Annotations_SubjectPhenotypesDS.txt"}
+              "subject_meta":"GTEx_v7_Annotations_SubjectPhenotypesDS.txt",
+               "merged_meta":"merged_meta.tsv"}
     meta=pd.read_csv(data_dir/manifest['sample_meta'],sep="\t")
     y=GTEx_sample_shrinker(meta,'SMTS',20)
     y.to_csv(data_dir/"filteredSAMPID.tsv",sep="\t",index=False)

@@ -68,6 +68,7 @@ if __name__ == '__main__':
     
     manifest={"data":"All_Tissue_Site_Details.combined.reads.gct",
               "sample_meta":"GTEx_v7_Annotations_SampleAttributesDS.txt",
-              "subject_meta":"GTEx_v7_Annotations_SubjectPhenotypesDS.txt"}
+              "subject_meta":"GTEx_v7_Annotations_SubjectPhenotypesDS.txt",
+               "merged_meta":"merged_meta.tsv"}
     data=rawExpressionData(data_dir,manifest)
     data.sampleMeta.to_csv(data_dir/"merged_meta.tsv",sep="\t")

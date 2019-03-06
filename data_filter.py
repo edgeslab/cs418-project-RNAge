@@ -9,7 +9,8 @@ def main(selected_SAMPID_file,counts_file):
 	with open(data_dir/counts_file) as f:
 		for l in f:
 			SAMPID=l.split("\t")[0]
-			print(SAMPID)
+			if SAMPID in selected_samples:
+				print(l)
 if __name__ == '__main__':
 	data_dir=Path("data")
 	selected_SAMPID="filteredSAMPID.tsv"
