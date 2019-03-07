@@ -12,7 +12,7 @@ def GTEx_sample_shrinker(meta,by_col,n=20):
             nn=nTissue
         else:
             nn=n
-        ans.append(meta[meta[by_col]==i].sample(nn)['SAMPID'])
+        ans.append(meta[meta[by_col]==i].sample(nn))
     selectedMeta=pd.concat(ans)
     return selectedMeta
 if __name__ == '__main__':
@@ -21,6 +21,7 @@ if __name__ == '__main__':
               "sample_meta":"GTEx_v7_Annotations_SampleAttributesDS.txt",
               "subject_meta":"GTEx_v7_Annotations_SubjectPhenotypesDS.txt",
                "merged_meta":"merged_meta.tsv"}
-    meta=pd.read_csv(data_dir/manifest['sample_meta'],sep="\t")
+    meta=pd.read_csv(data_dir/manifest['merged_meta'],sep="\t",dtype={'SMUBRID':object})
     y=GTEx_sample_shrinker(meta,'SMTS',20)
-    y.to_csv(data_dir/"filteredSAMPID.tsv",sep="\t",index=False)
+    y.to_csv(data_dir/"filteredMeta.tsv",sep="\t",index=False)
+    y['SAMPID'].to_csv(data_dir/"filteredSAMPID.tsv",sep="\t",index=False)
