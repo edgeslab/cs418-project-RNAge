@@ -35,10 +35,10 @@ class rawExpressionData():
         Output:
             Dataframe of ordered sample metadata.
         """
-        meta=self.subjMeta
+        SUBJmeta=self.subjMeta
         SAMPmeta=self.sampleMeta
-        SAMPmeta['SUBJID']=pd.Series(SAMPmeta['SAMPID'],index=SAMPmeta['SAMPID']).str.rsplit('-',n=3).str.get(0)
-        SAMPmeta=SAMPmeta.merge(meta,on="SUBJID",how="left")
+        SAMPmeta['SUBJID']=pd.Series(SAMPmeta['SAMPID']).str.rsplit('-',n=3).str.get(0)
+        SAMPmeta=SAMPmeta.merge(SUBJmeta,on="SUBJID",how="left")
         return SAMPmeta
     def readMeta(self,data_path):
         """
@@ -48,7 +48,7 @@ class rawExpressionData():
         Output:
             Pandas dataframe of sample metadata.
         """
-        data=pd.read_csv(data_path,sep="\t")
+        data=pd.read_csv(data_path,sep="\t",index_col=False)
         print("Imported metadata of dimensions",data.shape)
         return data
     def readRawCounts(self,data_path):
@@ -71,4 +71,4 @@ if __name__ == '__main__':
               "subject_meta":"GTEx_v7_Annotations_SubjectPhenotypesDS.txt",
                "merged_meta":"merged_meta.tsv"}
     data=rawExpressionData(data_dir,manifest)
-    data.sampleMeta.to_csv(data_dir/"merged_meta.tsv",sep="\t")
+    data.sampleMeta.to_csv(data_dir/"merged_meta.tsv",sep="\t",index=False)
