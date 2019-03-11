@@ -20,7 +20,7 @@ get_counts<-function(raw_frame) {
   return(t(counts))
 }
 
-plotmanual <- function(data, grp, title = NULL,alpha=.9,subtitle="lcpm;n=500") {
+plotmanual <- function(data, grp, title = NULL,alpha=.7,subtitle="lcpm;n=500") {
   res.pca <- prcomp(data, scale. = TRUE, center = TRUE)
   res.df <- as.data.frame(res.pca$x)
   percentage <-
@@ -58,7 +58,7 @@ metaBar<-function(meta,by_col,mar=c(5,8,4,2),main=FALSE) {
 get_PCAmat<-function(lcpm) {
   #mat will need to be horizontal.
   ntop <- 500
-  rv <- rowVars(lcpm)
+  rv <- matrixStats::rowVars(lcpm)
   select <- order(rv, decreasing = TRUE)[seq_len(min(ntop, length(rv)))]
   mat <- lcpm[select, ]
   return(mat)
@@ -85,8 +85,7 @@ counts<-get_counts(counts)
 rownames(meta)<-meta$SAMPID
 ### edgeR pre-processing
 counts<-DGEList(t(counts),samples=meta)
-counts <- calcNormFactors(x, method = "TMM")
-#cpm<-cpm(x)
+counts <- calcNormFactors(counts, method = "TMM")
 lcpm<-cpm(counts,log=TRUE)
 
 ## EDA
@@ -105,6 +104,9 @@ for(t in unique(meta$SMTS)){
   tissuePCA(lcpm,meta,t,"SMTSD")
 }
 
+for(t in unique(meta$SMTS)){
+  tissuePCA(lcpm,meta,t,"AGE")
+}
 
 ## Optional saving of pre-processed matrices
 #tlcpm<-data.table(t(lcpm))
