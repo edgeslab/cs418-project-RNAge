@@ -1,8 +1,10 @@
 library(edgeR)
 library(limma)
+library(foreach)
+library(doSNOW)
 
 ### common functions
-nsv_filter<-function(counts,verbose=FALSE) {
+nzv_filter<-function(counts,verbose=FALSE) {
   if(verbose) {
     print(paste0("Input:",ncol(counts)))
   }
@@ -83,12 +85,15 @@ setwd(root_dir)
 ### process data and metadata
 counts<-get_counts(counts)
 rownames(meta)<-meta$SAMPID
+keep<-meta$AGE
 ### edgeR pre-processing
 counts<-DGEList(t(counts),samples=meta)
 counts <- calcNormFactors(counts, method = "TMM")
+cpm<-cpm(counts)
 lcpm<-cpm(counts,log=TRUE)
 
 ## EDA
+EDA<-function(){
 png(file.path(root_dir,"plots","tissue_BAR.png"))
 metaBar(meta,"SMTS")
 dev.off()
@@ -107,8 +112,35 @@ for(t in unique(meta$SMTS)){
 for(t in unique(meta$SMTS)){
   tissuePCA(lcpm,meta,t,"AGE")
 }
+}
+#EDA()
 
+# Writing per-tissue tsv
+
+keep<-!meta$AGE==""
+filtered_meta<-meta[keep,]
+filtered_lcpm<-lcpm[,keep]
+filtered_cpm<-cpm[,keep]
+tissueSubset<-function() {
+  foreach(t=unique(filtered_meta$SMTS)) %do%
+    {
+      sel<-filtered_meta$SMTS==t
+      ldat<-filtered_cpm[,sel]
+      dat<-filtered_lcpm[,sel]
+      ldat<-data.table::data.table(t(ldat))
+      dat<-data.table::data.table(t(dat))
+      rownames(ldat)<-filtered_meta[filtered_meta$SMTS==t,]$SAMPID
+      rownames(dat)<-filtered_meta[filtered_meta$SMTS==t,]$SAMPID
+      data.table::fwrite(ldat,file = file.path(data_dir,"tissue-specific",paste0(t,"_lcpm.tsv")),sep = "\t",row.names = TRUE,nThread = 6)
+      data.table::fwrite(dat,file = file.path(data_dir,"tissue-specific",paste0(t,"_cpm.tsv")),sep = "\t",row.names = TRUE,nThread = 6)
+      
+    }
+}
+tissueSubset()
 ## Optional saving of pre-processed matrices
 #tlcpm<-data.table(t(lcpm))
+#tcpm<-data.table(t(cpm))
 #rownames(tlcpm)<-dimnames(lcpm)[[2]]
-#data.table::fwrite(tlcpm,file = file.path(data_dir,"lcpm.tsv"),sep = "\t",row.names = True,nThread = nCore)
+#rownames(tcpm)<-dimnames(tcpm)[[2]]
+#data.table::fwrite(tlcpm,file = file.path(data_dir,"lcpm.tsv"),sep = "\t",row.names = TRUE,nThread = nCore)
+#data.table::fwrite(tcpm,file = file.path(data_dir,"cpm.tsv"),sep = "\t",row.names = TRUE,nThread = nCore)
