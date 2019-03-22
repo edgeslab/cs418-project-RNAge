@@ -84,8 +84,8 @@ setwd(root_dir)
 
 ### process data and metadata
 counts<-get_counts(counts)
+colnames(counts)<-stringr::str_extract(colnames(counts),"[:alpha:]+[:digit:]+")
 rownames(meta)<-meta$SAMPID
-keep<-meta$AGE
 ### edgeR pre-processing
 counts<-DGEList(t(counts),samples=meta)
 counts <- calcNormFactors(counts, method = "TMM")
@@ -116,17 +116,17 @@ for(t in unique(meta$SMTS)){
 #EDA()
 
 # Writing per-tissue tsv
-
 keep<-!meta$AGE==""
 filtered_meta<-meta[keep,]
 filtered_lcpm<-lcpm[,keep]
 filtered_cpm<-cpm[,keep]
+metaBar(filtered_meta,"SMTS")
 tissueSubset<-function() {
   foreach(t=unique(filtered_meta$SMTS)) %do%
     {
       sel<-filtered_meta$SMTS==t
-      ldat<-filtered_cpm[,sel]
-      dat<-filtered_lcpm[,sel]
+      ldat<-filtered_lcpm[,sel]
+      dat<-filtered_cpm[,sel]
       ldat<-data.table::data.table(t(ldat))
       dat<-data.table::data.table(t(dat))
       rownames(ldat)<-filtered_meta[filtered_meta$SMTS==t,]$SAMPID
@@ -136,7 +136,8 @@ tissueSubset<-function() {
       
     }
 }
-tissueSubset()
+#tissueSubset()
+# !zip -r tissue-specific.zip tissue-specific
 ## Optional saving of pre-processed matrices
 #tlcpm<-data.table(t(lcpm))
 #tcpm<-data.table(t(cpm))

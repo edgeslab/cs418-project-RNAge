@@ -1,7 +1,4 @@
-template.py
-*.gct
-*.gz
-*DS.txt
 data/
 ._.DS_Store
-CS418/
+misc_notebooks/
+.ipynb_checkpoints/
