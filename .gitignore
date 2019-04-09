@@ -3,3 +3,8 @@ template.py
 *.gz
 *DS.txt
 data/
+DGE_plots/
+.ipynb_checkpoints/
+.Rproj.user/
+misc_notebooks/
+*.Rproj
