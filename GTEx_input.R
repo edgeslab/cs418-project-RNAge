@@ -1,9 +1,26 @@
+# This file contains basic analysis and data splitting functions for downstream analysis in Python.
+
+library(plyr)
 library(edgeR)
 library(limma)
-library(foreach)
-library(doSNOW)
+library(Glimma)
+
+### Params
+biomart_file_path=file.path("annotation","2018-04-12_biomart_ensemblGene_hgnc_uniprot.tab")
+uniprot_meta_path=file.path("annotation","uniprot_meta.tsv")
+nCore<-6
+root_dir<-"/home/imlay/storage/cs418-project-RNAge/"
+data_dir<-"/home/imlay/storage/cs418-project-RNAge/data"
 
 ### common functions
+filterBiomart <- function(infile) {
+  biomart1=read.table(infile, header=T, sep='\t', stringsAsFactors=FALSE,na.strings = "")
+  names(biomart1)=c("Gene","hgnc","uniprot")
+  #remove duplicated ensembl
+  biomart=biomart1[!duplicated(biomart1$Gene),]
+  #biomart$desc=sub(" [[].*","",biomart$desc)
+  return(biomart)
+}
 nzv_filter<-function(counts,verbose=FALSE) {
   if(verbose) {
     print(paste0("Input:",ncol(counts)))
@@ -71,10 +88,6 @@ tissuePCA<-function(lcpm,meta,tissue,grp) {
   plotmanual(t(mat),sel[[grp]],title=tissue,subtitle=paste0("lcpm ; n=",nrow(sel)))
   ggsave(file.path(root_dir,"plots",paste0(tissue,"_",grp,"_PCA.png")),width = 8,height=8)
 }
-### parameters
-nCore<-32
-root_dir<-"/home/imlay/storage/cs418-project-RNAge/"
-data_dir<-"/home/imlay/storage/cs418-project-RNAge/data"
 
 ### loading data
 setwd(data_dir)
@@ -86,11 +99,12 @@ setwd(root_dir)
 counts<-get_counts(counts)
 colnames(counts)<-stringr::str_extract(colnames(counts),"[:alpha:]+[:digit:]+")
 rownames(meta)<-meta$SAMPID
+
 ### edgeR pre-processing
 counts<-DGEList(t(counts),samples=meta)
 counts <- calcNormFactors(counts, method = "TMM")
-cpm<-cpm(counts)
 lcpm<-cpm(counts,log=TRUE)
+Glimma::glMDSPlot(lcpm, groups=meta[,c("SMTS","AGE","SEX","DTHHRDY")])
 
 ## EDA
 EDA<-function(){
@@ -118,25 +132,30 @@ for(t in unique(meta$SMTS)){
 # Writing per-tissue tsv
 keep<-!meta$AGE==""
 filtered_meta<-meta[keep,]
+filtered_counts<-counts$counts[,keep]
 filtered_lcpm<-lcpm[,keep]
 filtered_cpm<-cpm[,keep]
-metaBar(filtered_meta,"SMTS")
+library(foreach)
 tissueSubset<-function() {
   foreach(t=unique(filtered_meta$SMTS)) %do%
     {
       sel<-filtered_meta$SMTS==t
+      cdat<-filtered_counts[,sel]
       ldat<-filtered_lcpm[,sel]
       dat<-filtered_cpm[,sel]
+      cdat<-data.table::data.table(t(cdat))
       ldat<-data.table::data.table(t(ldat))
       dat<-data.table::data.table(t(dat))
+      rownames(cdat)<-filtered_meta[filtered_meta$SMTS==t,]$SAMPID
       rownames(ldat)<-filtered_meta[filtered_meta$SMTS==t,]$SAMPID
       rownames(dat)<-filtered_meta[filtered_meta$SMTS==t,]$SAMPID
+      data.table::fwrite(cdat,file = file.path(data_dir,"tissue-specific",paste0(t,"_c.tsv")),sep = "\t",row.names = TRUE,nThread = 6)
       data.table::fwrite(ldat,file = file.path(data_dir,"tissue-specific",paste0(t,"_lcpm.tsv")),sep = "\t",row.names = TRUE,nThread = 6)
       data.table::fwrite(dat,file = file.path(data_dir,"tissue-specific",paste0(t,"_cpm.tsv")),sep = "\t",row.names = TRUE,nThread = 6)
       
     }
 }
-#tissueSubset()
+tissueSubset()
 # !zip -r tissue-specific.zip tissue-specific
 ## Optional saving of pre-processed matrices
 #tlcpm<-data.table(t(lcpm))

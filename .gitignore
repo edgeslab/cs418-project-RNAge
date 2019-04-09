@@ -2,3 +2,6 @@ data/
 ._.DS_Store
 misc_notebooks/
 .ipynb_checkpoints/
+.Rproj.user
+*.Rproj
+DGE_plots/
