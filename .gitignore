@@ -3,3 +3,4 @@ template.py
 *.gz
 *DS.txt
 tissue-specific/
+*.h5
