@@ -8,3 +8,5 @@ DGE_plots/
 .Rproj.user/
 misc_notebooks/
 *.Rproj
+.Rproj.user
+.Rhistory
