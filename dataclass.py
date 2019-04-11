@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # encoding: utf-8
-# Benjamin Imlay
+# Code owner: Benjamin Imlay
 import pandas as pd
 from pathlib import Path
 class expressionData():
