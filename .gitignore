@@ -2,4 +2,4 @@ template.py
 *.gct
 *.gz
 *DS.txt
-data/
+tissue-specific/
