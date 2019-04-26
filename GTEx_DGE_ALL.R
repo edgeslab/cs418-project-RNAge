@@ -8,8 +8,8 @@ library(stringr)
 biomart_file_path=file.path("annotation","2018-04-12_biomart_ensemblGene_hgnc_uniprot.tab")
 uniprot_meta_path=file.path("annotation","uniprot_meta.tsv")
 nCore<-6
-root_dir<-"/home/imlay/storage_2/cs418-project-RNAge/"
-data_dir<-"/home/imlay/storage_2/cs418-project-RNAge/data"
+root_dir<-"/home/imlay/storage_2/misc_repos/cs418-project-RNAge/"
+data_dir<-"/home/imlay/storage_2/misc_repos/cs418-project-RNAge/data"
 
 ### common functions
 filterBiomart <- function(infile) {
@@ -46,10 +46,10 @@ counts <- calcNormFactors(counts, method = "TMM")
 # Remove tissues with too few samples.
 tiss_table<-table(meta$SMTS)>200
 DEG_tissues<-names(tiss_table[tiss_table==TRUE])
-for(TISSUE in DEG_tissues) {
-#for(TISSUE in c("Brain")) {
-dir.create(path = file.path("DGE_plots",TISSUE),recursive = TRUE,showWarnings = FALSE)
-keep<-meta$AGE!="" & meta$SMTS==TISSUE
+sel<-meta$SMTS %in% DEG_tissues
+meta<-meta[sel,]
+counts<-counts[,sel]
+keep<-meta$AGE!=""
 DEG_meta<-meta[keep,]
 DEG_counts<-counts[,keep]
 #rm(counts)
@@ -109,20 +109,21 @@ contr.matrix <- makeContrasts(
   #A1vA4_M= A1_FE-A4_M,
   #A1vA5_M= A1_FE-A5_M,
 #  levels = colnames(design))
-png(filename = file.path("DGE_plots",TISSUE,"Init_SA.png"))
+png(filename = file.path("DGE_plots","Init_SA.png"))
 v <- voom(DEG_counts, design, plot=TRUE)
 dev.off()
 vfit <- lmFit(v, design)
 vfit <- contrasts.fit(vfit, contrasts=contr.matrix)
 efit <- eBayes(vfit)
-png(filename = file.path("DGE_plots",TISSUE,"Final_SA.png"))
+png(filename = file.path("DGE_plots","Final_SA.png"))
 plotSA(efit, main="Final model: Mean-variance trend")
 dev.off()
 tfit <- treat(vfit, lfc=1)
 dt <- decideTests(tfit,p.value = .05)
-png(file.path("DGE_plots",TISSUE,"MDplot.png"))
+png(file.path("DGE_plots","MDplot_all.png"))
 plotMD(tfit,status = dt)
 dev.off()
+
 ### Getting gene annotation
 biomart<-filterBiomart(biomart_file_path)
 ## one time uniprot file creation for uniprot_topology_parser.py
@@ -141,8 +142,7 @@ names(genes)[1]<-"ENSEMBL"
 
 ## Final plot and placement into directories
 
-glMDPlot(tfit, coef=1, status=dt, main=colnames(tfit)[1],folder=file.path("DGE_plots",TISSUE),
-         side.main="hgnc", counts=DEG_lcpm, groups=DEG_meta$AGE,anno=genes,launch = FALSE)
-glMDSPlot(DEG_lcpm, groups=DEG_meta[,c("SMTS","SMTSD","AGE","SEX","DTHHRDY")], folder=file.path("DGE_plots",TISSUE),launch=FALSE)
-data.table::fwrite(topTreat(tfit,coef=1,n=Inf),file = file.path("DGE_plots",TISSUE,"DGE_results.tsv"),sep = "\t",row.names = TRUE)
-}
+#glMDPlot(tfit, coef=1, status=dt, main=colnames(tfit)[1],folder=file.path("DGE_plots"),
+#         side.main="hgnc", counts=DEG_lcpm, groups=DEG_meta$AGE,anno=genes,launch = FALSE)
+#glMDSPlot(DEG_lcpm, groups=DEG_meta[,c("SMTS","SMTSD","AGE","SEX","DTHHRDY")], folder=file.path("DGE_plots",TISSUE),launch=FALSE)
+#data.table::fwrite(topTreat(tfit,coef=1,n=Inf),file = file.path("DGE_plots",TISSUE,"DGE_results.tsv"),sep = "\t",row.names = TRUE)
