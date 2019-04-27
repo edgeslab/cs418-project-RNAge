@@ -54,9 +54,13 @@ DEG_meta<-meta[keep,]
 DEG_counts<-counts[,keep]
 DEG_meta$DTHHRDY<-droplevels(DEG_meta$DTHHRDY)
 #rm(counts)
-## Changing age to numeric
 
-DEG_lcpm<-cpm(counts,log = TRUE)
+print(paste0("Input: ",nrow(DEG_counts)))
+keep.exprs <- filterByExpr(DEG_counts$counts,group=factor(DEG_meta$DTHHRDY),min.count = 15) #first thing the function does is convert counts to matrix. MinSamples=10+(n-10)*.7
+DEG_counts <- DEG_counts[keep.exprs,, keep.lib.sizes=FALSE]
+print(paste0("Output: ",nrow(DEG_counts)))
+
+DEG_lcpm<-cpm(DEG_counts,log = TRUE)
 
 ## DEG
 design<-model.matrix(~0+DTHHRDY,data=DEG_meta)
@@ -64,20 +68,23 @@ colnames(design)<-str_remove(colnames(design),"DTHHRDY")
 contr.matrix <- makeContrasts(
   FastvVent = Vent-Fast_Nat,
   levels = colnames(design))
-png(filename = file.path("DGE_plots","Init_SA.png"))
+png(filename = file.path("DGE_plots","DEATH","Init_SA.png"))
 v <- voom(DEG_counts, design, plot=TRUE)
 dev.off()
 vfit <- lmFit(v, design)
 vfit <- contrasts.fit(vfit, contrasts=contr.matrix)
 efit <- eBayes(vfit)
-png(filename = file.path("DGE_plots","Final_SA.png"))
+png(filename = file.path("DGE_plots","DEATH","Final_SA.png"))
 plotSA(efit, main="Final model: Mean-variance trend")
 dev.off()
 tfit <- treat(vfit, lfc=1)
 dt <- decideTests(tfit,p.value = .05)
-png(file.path("DGE_plots","MDplot_DEATH_all.png"))
+png(file.path("DGE_plots","DEATH","MDplot_DEATH_all.png"))
 plotMD(tfit,status = dt)
 dev.off()
+## Positive FC is enrichment in vent deaths
+## Negative FC is enrichment in natural, fast deaths
+
 
 ### Getting gene annotation
 biomart<-filterBiomart(biomart_file_path)
@@ -96,8 +103,12 @@ genes<-genes[!duplicated(genes$Gene),]
 names(genes)[1]<-"ENSEMBL"
 
 ## Final plot and placement into directories
-
-#glMDPlot(tfit, coef=1, status=dt, main=colnames(tfit)[1],folder=file.path("DGE_plots"),
-#         side.main="hgnc", counts=DEG_lcpm, groups=DEG_meta$AGE,anno=genes,launch = FALSE)
-#glMDSPlot(DEG_lcpm, groups=DEG_meta[,c("SMTS","SMTSD","AGE","SEX","DTHHRDY")], folder=file.path("DGE_plots",TISSUE),launch=FALSE)
-#data.table::fwrite(topTreat(tfit,coef=1,n=Inf),file = file.path("DGE_plots",TISSUE,"DGE_results.tsv"),sep = "\t",row.names = TRUE)
+DGE_results<-topTreat(tfit, coef=1, n=Inf)
+DGE_results$Gene<-rownames(DGE_results)
+DGE_results<-join(DGE_results,biomart)
+DGE_results<-DGE_results[!duplicated(DGE_results$Gene),]
+rownames(DGE_results)<-DGE_results$Gene
+data.table::fwrite(DGE_results,file=file.path("DGE_plots","DEATH","DGE_results.tsv"),sep="\t",row.names = TRUE)
+glMDPlot(tfit, coef=1, status=dt, main=colnames(tfit)[1],folder=file.path("DGE_plots","DEATH"),
+         side.main="hgnc", counts=DEG_lcpm, groups=DEG_meta$DTHHRDY,anno=genes,launch = FALSE)
+glMDSPlot(DEG_lcpm, groups=DEG_meta[,c("SMTS","SMTSD","AGE","SEX","DTHHRDY")], main=paste0("All Tissue MDS Plot") folder=file.path("DGE_plots","all_MDS"),launch=FALSE)
