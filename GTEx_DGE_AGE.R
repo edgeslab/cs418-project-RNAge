@@ -8,8 +8,8 @@ library(stringr)
 biomart_file_path=file.path("annotation","2018-04-12_biomart_ensemblGene_hgnc_uniprot.tab")
 uniprot_meta_path=file.path("annotation","uniprot_meta.tsv")
 nCore<-6
-root_dir<-"/home/imlay/storage_2/cs418-project-RNAge/"
-data_dir<-"/home/imlay/storage_2/cs418-project-RNAge/data"
+root_dir<-"/home/imlay/storage_2/misc_repos/cs418-project-RNAge/"
+data_dir<-"/home/imlay/storage_2/misc_repos/cs418-project-RNAge/data"
 
 ### common functions
 filterBiomart <- function(infile) {
@@ -143,6 +143,6 @@ names(genes)[1]<-"ENSEMBL"
 
 glMDPlot(tfit, coef=1, status=dt, main=colnames(tfit)[1],folder=file.path("DGE_plots",TISSUE),
          side.main="hgnc", counts=DEG_lcpm, groups=DEG_meta$AGE,anno=genes,launch = FALSE)
-glMDSPlot(DEG_lcpm, groups=DEG_meta[,c("SMTS","SMTSD","AGE","SEX","DTHHRDY")], main=paste0(TISSUE," MDS Plot") folder=file.path("DGE_plots",TISSUE),launch=FALSE)
+glMDSPlot(DEG_lcpm, groups=DEG_meta[,c("SMTS","SMTSD","AGE","SEX","DTHHRDY")], main=paste0(TISSUE," MDS Plot"), folder=file.path("DGE_plots",TISSUE),launch=FALSE)
 data.table::fwrite(topTreat(tfit,coef=1,n=Inf),file = file.path("DGE_plots",TISSUE,"DGE_results.tsv"),sep = "\t",row.names = TRUE)
 }

@@ -109,6 +109,6 @@ DGE_results<-join(DGE_results,biomart)
 DGE_results<-DGE_results[!duplicated(DGE_results$Gene),]
 rownames(DGE_results)<-DGE_results$Gene
 data.table::fwrite(DGE_results,file=file.path("DGE_plots","DEATH","DGE_results.tsv"),sep="\t",row.names = TRUE)
-glMDPlot(tfit, coef=1, status=dt, main=colnames(tfit)[1],folder=file.path("DGE_plots","DEATH"),
-         side.main="hgnc", counts=DEG_lcpm, groups=DEG_meta$DTHHRDY,anno=genes,launch = FALSE)
-glMDSPlot(DEG_lcpm, groups=DEG_meta[,c("SMTS","SMTSD","AGE","SEX","DTHHRDY")], main=paste0("All Tissue MDS Plot") folder=file.path("DGE_plots","all_MDS"),launch=FALSE)
+#glMDPlot(tfit, coef=1, status=dt, main=colnames(tfit)[1],folder=file.path("DGE_plots","DEATH"),
+#         side.main="hgnc", counts=DEG_lcpm, groups=DEG_meta$DTHHRDY,anno=genes,launch = FALSE)
+#glMDSPlot(DEG_lcpm, groups=DEG_meta[,c("SMTS","SMTSD","AGE","SEX","DTHHRDY")], main=paste0("All Tissue MDS Plot") folder=file.path("DGE_plots","all_MDS"),launch=FALSE)

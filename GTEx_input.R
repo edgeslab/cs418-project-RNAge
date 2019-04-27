@@ -9,8 +9,8 @@ library(Glimma)
 biomart_file_path=file.path("annotation","2018-04-12_biomart_ensemblGene_hgnc_uniprot.tab")
 uniprot_meta_path=file.path("annotation","uniprot_meta.tsv")
 nCore<-6
-root_dir<-"/home/imlay/storage/cs418-project-RNAge/"
-data_dir<-"/home/imlay/storage/cs418-project-RNAge/data"
+root_dir<-"/home/imlay/storage_2/misc_repos/cs418-project-RNAge/"
+data_dir<-"/home/imlay/storage_2/misc_repos/cs418-project-RNAge/data"
 
 ### common functions
 filterBiomart <- function(infile) {
@@ -116,8 +116,8 @@ metaBar(meta,"AGE")
 dev.off()
 
 mat<-get_PCAmat(lcpm)
-plotmanual(t(mat),meta$AGE,title="All samples")
-ggsave(file.path(root_dir,"plots","All_age_PCA.png"))
+plotmanual(t(mat),meta$SMTS,title="All samples by Tissue Origin")
+ggsave(file.path(root_dir,"plots","All_SMTS_PCA.png"))
 
 for(t in unique(meta$SMTS)){
   tissuePCA(lcpm,meta,t,"SMTSD")
