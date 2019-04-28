@@ -1,0 +1,16 @@
+tissue_type	model_file	model_accuracy
+Adipose Tissue	Adipose Tissue_keras_model.h5	67.0087993144989
+Blood Vessel	Blood Vessel_keras_model.h5	69.67005133628845
+Brain	Brain_keras_model.h5	5.0847455859184265
+Breast	Breast_keras_model.h5	67.7419364452362
+Colon	Colon_keras_model.h5	79.38596606254578
+Esophagus	Esophagus_keras_model.h5	79.32900190353394
+Heart	Heart_keras_model.h5	64.5792543888092
+Lung	Lung_keras_model.h5	66.02739691734314
+Muscle	Muscle_keras_model.h5	64.65517282485962
+Nerve	Nerve_keras_model.h5	64.92753624916077
+Pancreas	Pancreas_keras_model.h5	90.67796468734741
+Skin	Skin_keras_model.h5	64.17003870010376
+Stomach	Stomach_keras_model.h5	89.99999761581421
+Testis	Testis_keras_model.h5	62.18487620353699
+Thyroid	Thyroid_keras_model.h5	65.20618796348572
