@@ -86,7 +86,7 @@ dev.off()
 tfit <- treat(vfit, lfc=1)
 dt <- decideTests(tfit,p.value = .01)
 png(file.path("DGE_plots","DEATH",TISSUE,"MDplot_DEATH_all.png"))
-plotMD(tfit,status = dt)
+plotMD(tfit,status = dt,main = paste0(TISSUE," MD plot: Fast Nat vs. Vent"))
 dev.off()
 ## Positive FC is enrichment in vent deaths
 ## Negative FC is enrichment in natural, fast deaths
