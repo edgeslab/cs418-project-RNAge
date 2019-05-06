@@ -9,8 +9,7 @@ library(Glimma)
 biomart_file_path=file.path("annotation","2018-04-12_biomart_ensemblGene_hgnc_uniprot.tab")
 uniprot_meta_path=file.path("annotation","uniprot_meta.tsv")
 nCore<-6
-root_dir<-"/home/imlay/storage_2/misc_repos/cs418-project-RNAge/"
-data_dir<-"/home/imlay/storage_2/misc_repos/cs418-project-RNAge/data"
+data_dir<-"data"
 
 ### common functions
 filterBiomart <- function(infile) {
@@ -90,10 +89,8 @@ tissuePCA<-function(lcpm,meta,tissue,grp) {
 }
 
 ### loading data
-setwd(data_dir)
-meta<-data.table::fread("merged_meta.tsv",sep="\t",header=TRUE,na.strings="na",nThread=nCore)
-counts<-data.table::fread("All_Tissue_Site_Details.combined.reads.gct",nThread=nCore)
-setwd(root_dir)
+meta<-data.table::fread(file.path(data_dir,"merged_meta.tsv"),sep="\t",header=TRUE,na.strings="na",nThread=nCore)
+counts<-data.table::fread(file.path(data_dir,"All_Tissue_Site_Details.combined.reads.gct"),nThread=nCore)
 
 ### process data and metadata
 counts<-get_counts(counts)
@@ -104,7 +101,7 @@ rownames(meta)<-meta$SAMPID
 counts<-DGEList(t(counts),samples=meta)
 counts <- calcNormFactors(counts, method = "TMM")
 lcpm<-cpm(counts,log=TRUE)
-Glimma::glMDSPlot(lcpm, groups=meta[,c("SMTS","AGE","SEX","DTHHRDY")])
+Glimma::glMDSPlot(lcpm, groups=meta[,c("SMTS","AGE","SEX","DTHHRDY")],launch=F,folder=data_dir)
 
 ## EDA
 EDA<-function(){
@@ -130,6 +127,7 @@ for(t in unique(meta$SMTS)){
 #EDA()
 
 # Writing per-tissue tsv
+dir.create(path = file.path(data_dir,"tissue-specific"),showWarnings = F)
 keep<-!meta$AGE==""
 filtered_meta<-meta[keep,]
 filtered_counts<-counts$counts[,keep]
@@ -141,16 +139,12 @@ tissueSubset<-function() {
     {
       sel<-filtered_meta$SMTS==t
       cdat<-filtered_counts[,sel]
-      ldat<-filtered_lcpm[,sel]
       dat<-filtered_cpm[,sel]
       cdat<-data.table::data.table(t(cdat))
-      ldat<-data.table::data.table(t(ldat))
       dat<-data.table::data.table(t(dat))
       rownames(cdat)<-filtered_meta[filtered_meta$SMTS==t,]$SAMPID
-      rownames(ldat)<-filtered_meta[filtered_meta$SMTS==t,]$SAMPID
       rownames(dat)<-filtered_meta[filtered_meta$SMTS==t,]$SAMPID
       data.table::fwrite(cdat,file = file.path(data_dir,"tissue-specific",paste0(t,"_c.tsv")),sep = "\t",row.names = TRUE,nThread = 6)
-      data.table::fwrite(ldat,file = file.path(data_dir,"tissue-specific",paste0(t,"_lcpm.tsv")),sep = "\t",row.names = TRUE,nThread = 6)
       data.table::fwrite(dat,file = file.path(data_dir,"tissue-specific",paste0(t,"_cpm.tsv")),sep = "\t",row.names = TRUE,nThread = 6)
       
     }
