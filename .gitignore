@@ -10,3 +10,4 @@ misc_notebooks/
 *.Rproj
 .Rproj.user
 .Rhistory
+__pycache__/
