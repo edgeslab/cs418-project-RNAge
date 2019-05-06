@@ -100,7 +100,7 @@ names(genes)[1]<-"ENSEMBL"
 
 ### Final Glimma plot, writing DGE results and placement into directories
 
-glMDPlot(tfit, coef=1, status=dt, main=colnames(tfit)[1],folder=file.path("DGE_plots",TISSUE),
+glMDPlot(tfit, coef=1, status=dt, main=paste0(TISSUE," ",colnames(tfit)[1]),folder=file.path("DGE_plots",TISSUE),
          side.main="hgnc", counts=DEG_lcpm, groups=DEG_meta$AGE,anno=genes,launch = FALSE)
 glMDSPlot(DEG_lcpm, groups=DEG_meta[,c("SMTS","SMTSD","AGE","SEX","DTHHRDY")], main=paste0(TISSUE," MDS Plot"), folder=file.path("DGE_plots",TISSUE),launch=FALSE)
 data.table::fwrite(topTreat(tfit,coef=1,n=Inf),file = file.path("DGE_plots",TISSUE,paste0(TISSUE,"DGE_results.tsv")),sep = "\t",row.names = TRUE)
