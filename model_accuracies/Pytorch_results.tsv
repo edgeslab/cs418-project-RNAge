@@ -1,0 +1,16 @@
+Pytorch_Accuracy
+Adipose Tissue	.3662
+Blood Vessel	.3959
+Brain	.3939
+Breast	.2857
+Colon	.3361
+Esophagus	.3969
+Heart	.3405
+Lung	.3322
+Muscle	.3426
+Nerve	.3218
+Pancreas	.341
+Skin	.3175
+Stomach	.3297
+Testis	.3038
+Thyroid	.4006
