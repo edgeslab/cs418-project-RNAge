@@ -10,6 +10,9 @@ import sklearn.model_selection
 import sklearn.feature_selection
 from os import listdir
 
+import warnings
+warnings.filterwarnings("ignore")
+
 #Setting up the environment and importing the necessary data
 
 sns.set_style("darkgrid")
