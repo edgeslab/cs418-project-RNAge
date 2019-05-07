@@ -85,7 +85,7 @@ plotSA(efit, main="Final model: Mean-variance trend")
 dev.off()
 tfit <- treat(vfit, lfc=1)
 dt <- decideTests(tfit,p.value = .01)
-png(file.path("DGE_plots","DEATH",TISSUE,"MDplot_DEATH_all.png"))
+png(file.path("DGE_plots","DEATH",TISSUE,paste0(TISSUE,"MDplot_DEATH.png")))
 plotMD(tfit,status = dt,main = paste0(TISSUE," MD plot: Fast Nat vs. Vent"))
 dev.off()
 ## Positive FC is enrichment in vent deaths
@@ -114,7 +114,7 @@ DGE_results$Gene<-rownames(DGE_results)
 DGE_results<-join(DGE_results,biomart)
 DGE_results<-DGE_results[!duplicated(DGE_results$Gene),]
 rownames(DGE_results)<-DGE_results$Gene
-data.table::fwrite(DGE_results,file=file.path("DGE_plots","DEATH",TISSUE,"DGE_results.tsv"),sep="\t",row.names = TRUE)
-glMDPlot(tfit, coef=1, status=dt, main=colnames(tfit)[1],folder=file.path("DGE_plots","DEATH",TISSUE),
+data.table::fwrite(DGE_results,file=file.path("DGE_plots","DEATH",TISSUE,paste0(TISSUE,"DGE_DEATH_results.tsv")),sep="\t",row.names = TRUE)
+glMDPlot(tfit, coef=1, status=dt, main=paste0(TISSUE,": ",colnames(tfit)[1]),folder=file.path("DGE_plots","DEATH",TISSUE),
          side.main="hgnc", counts=DEG_lcpm, groups=DEG_meta$DTHHRDY,anno=genes,launch = FALSE)
 }
