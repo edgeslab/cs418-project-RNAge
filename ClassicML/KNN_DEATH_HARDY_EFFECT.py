@@ -52,7 +52,7 @@ def simpleExpressionFilter(counts,min_count):
         print("Post",filtered_counts.shape[1])
         return keep
 
-accuracy_HARDY_SVM=[]
+accuracy_HARDY_KNN=[]
 for TISSUE in Tissue_list:
     cpm=pd.read_csv(tissue_dir/str(TISSUE+"_cpm.tsv"),sep="\t",index_col=0)
     #lcpm=pd.read_csv(tissue_dir/str(TISSUE+"_lcpm.tsv"),sep="\t",index_col=0)
@@ -66,7 +66,7 @@ for TISSUE in Tissue_list:
     cdat=pca.fit_transform(cdat)
     cdat_train, cdat_test, y_train, y_test = \
         sklearn.model_selection.train_test_split(cdat, tissue_meta['DTHHRDY'], test_size=.3, random_state=1234)
-    init=sklearn.svm.classes.SVC(kernel='linear')
+    init=sklearn.neighbors.KNeighborsClassifier(n_neighbors=2)
     classifier=init.fit(cdat_train, y_train)
     ev=classifier.predict(cdat_test)
     
@@ -79,19 +79,20 @@ for TISSUE in Tissue_list:
             a=1
         ac=ac+a
     ac=1-ac/len(y_test)
-    accuracy_HARDY_SVM.append(ac)
+    accuracy_HARDY_KNN.append(ac)
+    print('The accuracy for ')
+    print(TISSUE)
+    print(' is: ')
+    print(accuracy_HARDY_KNN)
     
-    
-SVM_ACCURACY_HARDY=pd.DataFrame(columns=['tissue', 'accuracy'])
-SVM_ACCURACY_HARDY['tissue']=Tissue_list
-SVM_ACCURACY_HARDY['accuracy']=accuracy_HARDY_SVM
-SVM_ACCURACY_HARDY.to_csv('SVM_ACCURACY_HARDY.csv')
+KNN_ACCURACY_HARDY=pd.DataFrame(columns=['tissue', 'accuracy'])
+KNN_ACCURACY_HARDY['tissue']=Tissue_list
+KNN_ACCURACY_HARDY['accuracy']=accuracy_HARDY_KNN
+KNN_ACCURACY_HARDY.to_csv('KNN_ACCURACY_HARDY.csv')
 
-sns.barplot(Tissue_list, accuracy_HARDY_SVM)
-plt.title('Accuracy of Different Tissues for SVM Method in Predicting Death Type')
+sns.barplot(Tissue_list, accuracy_HARDY_KNN)
+plt.title('Accuracy of Different Tissues for KNN Method in Predicting Death Type')
 plt.xlabel('Tissue Type')
 plt.ylabel('Accuracy')
 plt.xticks(rotation=30, ha='right')
-plt.savefig('SVM_Accuracy_HARDY.png')
-
-
+plt.savefig('KNN_Accuracy_HARDY.png')
