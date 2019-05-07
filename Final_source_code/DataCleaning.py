@@ -72,4 +72,4 @@ var_keep=selector.get_support(indices=True)
 train_final=cpm_train_expression_filter.iloc[:,var_keep]
 test_final=cpm_test_expression_filter.iloc[:,var_keep]
 print("+Variance Filter Gene Count: "+str(len(train_final.columns)))
-display(train_final.head())
+display(train_final.head(3))
