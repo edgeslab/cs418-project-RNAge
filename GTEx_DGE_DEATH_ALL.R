@@ -8,8 +8,7 @@ library(stringr)
 biomart_file_path=file.path("annotation","2018-04-12_biomart_ensemblGene_hgnc_uniprot.tab")
 uniprot_meta_path=file.path("annotation","uniprot_meta.tsv")
 nCore<-6
-root_dir<-"/home/imlay/storage_2/misc_repos/cs418-project-RNAge/"
-data_dir<-"/home/imlay/storage_2/misc_repos/cs418-project-RNAge/data"
+data_dir<-"data"
 
 ### common functions
 filterBiomart <- function(infile) {
@@ -111,4 +110,3 @@ rownames(DGE_results)<-DGE_results$Gene
 data.table::fwrite(DGE_results,file=file.path("DGE_plots","DEATH","DGE_results.tsv"),sep="\t",row.names = TRUE)
 glMDPlot(tfit, coef=1, status=dt, main=colnames(tfit)[1],folder=file.path("DGE_plots","DEATH"),
          side.main="hgnc", counts=DEG_lcpm, groups=DEG_meta$DTHHRDY,anno=genes,launch = FALSE)
-#glMDSPlot(DEG_lcpm, groups=DEG_meta[,c("SMTS","SMTSD","AGE","SEX","DTHHRDY")], main=paste0("All Tissue MDS Plot") folder=file.path("DGE_plots","all_MDS"),launch=FALSE)
