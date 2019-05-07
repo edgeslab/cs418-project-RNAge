@@ -1,6 +1,24 @@
+import Init as init
+
+import os
+from pathlib import Path
+import pandas as pd
+import numpy as np
+import sklearn
+
+from os import listdir
+
+import warnings
+warnings.filterwarnings("ignore")
+
+meta = init.meta
+
 meta=meta[~(meta['AGE'].isnull())] # removes all samples without age
 
 counts=pd.DataFrame(meta['SMTS'].value_counts())
+
+data_dir=Path("data")
+tissue_dir=Path("tissue-specific")
 
 #There are many tissues with >200 samples with age recorded. Only tissues with 200 samples or more will be considered for predictive analysis.
 
@@ -16,6 +34,16 @@ def filter_by_expr(counts,min_count=None,min_sample=None,grp=None):
     gene_counts=np.sum(counts)
     
 #Filter by row count threshold
+
+TISSUE='Colon'
+TISSUE='Colon'
+infiles=listdir(tissue_dir)
+TISSUE_files=[f for f in infiles if  TISSUE in f]
+TISSUE_files
+
+cpm=pd.read_csv(tissue_dir/str(TISSUE+"_cpm.tsv"),sep="\t",index_col=0)
+lcpm=pd.read_csv(tissue_dir/str(TISSUE+"_lcpm.tsv"),sep="\t",index_col=0)
+cdat=pd.read_csv(tissue_dir/str(TISSUE+"_c.tsv"),sep="\t",index_col=0)
 
 tissue_meta=meta[(meta['SMTS']==TISSUE)]
 tissue_meta.iloc[0:3]
@@ -46,3 +74,5 @@ selector.fit(cpm_train_expression_filter)
 var_keep=selector.get_support(indices=True)
 train_final=cpm_train_expression_filter.iloc[:,var_keep]
 test_final=cpm_test_expression_filter.iloc[:,var_keep]
+
+display(train_final.head())
