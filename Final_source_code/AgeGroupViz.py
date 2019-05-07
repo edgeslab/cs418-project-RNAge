@@ -60,15 +60,13 @@ ind = np.arange(N)
 width = 0.4
 
 i = 0
-plt.bar(ind, percent_matrix[i], width, color=colorPalette[i*2-1])
-i += 1
 while i < len(unique_age):
     j = i-1
     res = np.zeros(shape=(1, len(unique_tissue)))
     while j >= 0:
         res += percent_matrix[j]
         j -= 1
-    plt.bar(ind, percent_matrix[i], width, bottom=res[0], color=colorPalette[i*2-1], tick_label='placeholder')
+    plt.bar(ind, percent_matrix[i], width, bottom=res[0], color=colorPalette[i*4-1], tick_label='placeholder')
     i += 1
     
 ax.set_xticklabels(unique_tissue, rotation=90)
@@ -79,12 +77,12 @@ ax.set(ylim=(0,100))
 ax.set(yticks=np.arange(0,110,10))
 
 leg_ele = [
-    Line2D([0], [0], lw=2, color=colorPalette[0], label=unique_age[0]),
-    Line2D([0], [0], lw=2, color=colorPalette[1], label=unique_age[1]),
-    Line2D([0], [0], lw=2, color=colorPalette[2], label=unique_age[2]),
-    Line2D([0], [0], lw=2, color=colorPalette[3], label=unique_age[3]),
-    Line2D([0], [0], lw=2, color=colorPalette[4], label=unique_age[4]),
-    Line2D([0], [0], lw=2, color=colorPalette[5], label=unique_age[5])
+    Line2D([0], [0], lw=2, color=colorPalette[0*4-1], label=unique_age[0]),
+    Line2D([0], [0], lw=2, color=colorPalette[1*4-1], label=unique_age[1]),
+    Line2D([0], [0], lw=2, color=colorPalette[2*4-1], label=unique_age[2]),
+    Line2D([0], [0], lw=2, color=colorPalette[3*4-1], label=unique_age[3]),
+    Line2D([0], [0], lw=2, color=colorPalette[4*4-1], label=unique_age[4]),
+    Line2D([0], [0], lw=2, color=colorPalette[5*4-1], label=unique_age[5])
     ]
 ax.legend(handles = leg_ele, loc='upper left', bbox_to_anchor=(1,1), title='Age groups')
        
