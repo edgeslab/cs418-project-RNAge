@@ -12,7 +12,7 @@ from os import listdir
 from sklearn.decomposition import PCA
 
 fig, axs=plt.subplots(1,2,squeeze=False,figsize=(15,5),sharex=True)
-accuracy_SVMM=pd.read_csv('SVM_ACCURACY_FILE.csv')
+accuracy_SVMM=pd.read_csv('ClassicML/SVM_ACCURACY_FILE.csv')
 
 print(fig)
 f=sns.barplot(accuracy_SVMM['tissue'], accuracy_SVMM['accuracy'], ax=axs[0][0])#.set_title('Accuracy of Different Tissues for SVM method')
@@ -22,7 +22,7 @@ f.set_ylabel('Accuracy')
 for tick in axs[0][0].get_xticklabels():
     tick.set_rotation(40)
     tick.set_ha('right')
-accuracy_KNNN=pd.read_csv('KNN_ACCURACY_FILE.csv')
+accuracy_KNNN=pd.read_csv('ClassicML/KNN_ACCURACY_FILE.csv')
 
 sns.barplot(accuracy_KNNN['tissue'], accuracy_KNNN['accuracy'],ax=axs[0][1])
 plt.title('Accuracy of Different Tissues for KNN method')
