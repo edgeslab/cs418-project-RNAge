@@ -51,7 +51,7 @@ for i in range(cmap.N):
     colorPalette.append(mpl.colors.rgb2hex(rgb))
 
 mpl.style.use('default')
-fig = plt.figure(figsize=(8,4))
+fig = plt.figure(figsize=(6,3))
 ax = fig.add_subplot(111)
 
 configs = percent_matrix[0]
@@ -69,7 +69,7 @@ while i < len(unique_age):
     plt.bar(ind, percent_matrix[i], width, bottom=res[0], color=colorPalette[i*4-1], tick_label='placeholder')
     i += 1
     
-ax.set_xticklabels(unique_tissue, rotation=90)
+ax.set_xticklabels(unique_tissue, rotation=45, ha='right')
 ax.set(title='Distribution of age groups per tissue type')
 ax.set(xlabel='Tissue types')
 ax.set(ylabel='Perentage of data points per tissue type')

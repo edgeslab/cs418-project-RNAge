@@ -170,7 +170,7 @@ model_plot = sns.barplot(x = keras_model['tissue_type'],
             capsize=0.1)
 
 tick_labels = keras_model['tissue_type'].as_matrix()
-ax.set_xticklabels(tick_labels,rotation=90)
+ax.set_xticklabels(tick_labels,rotation=30)
 ax.set(ylim=(0,50))
 ax.set(title='Keras: accuracy across tissue types')
 ax.set(xlabel='Tissue types')

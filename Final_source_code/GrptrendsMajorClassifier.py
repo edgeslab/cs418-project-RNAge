@@ -22,7 +22,7 @@ model_plot = sns.barplot(x = maj_clf['SMTS'],
             capsize=0.1)
 
 tick_labels = maj_clf['SMTS'].as_matrix()
-ax.set_xticklabels(tick_labels,rotation=90)
+ax.set_xticklabels(tick_labels,rotation=30, ha='right')
 ax.set(ylim=(0,50))
 ax.set(title='Majority classifier accuracy across tissue types')
 ax.set(xlabel='Tissue types')

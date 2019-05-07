@@ -17,7 +17,7 @@ meta=meta[~(meta['AGE'].isnull())] # removes all samples without age
 
 counts=pd.DataFrame(meta['SMTS'].value_counts())
 
-data_dir=Path("data")
+data_dir=Path("")
 tissue_dir=Path("tissue-specific")
 
 #There are many tissues with >200 samples with age recorded. Only tissues with 200 samples or more will be considered for predictive analysis.

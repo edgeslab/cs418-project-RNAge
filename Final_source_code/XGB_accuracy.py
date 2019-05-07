@@ -16,12 +16,12 @@ from sklearn.externals import joblib
 from xgboost import plot_tree
 
 def plotXGB(algs,results):
-    plt.figure(figsize=(8, 4))
+    plt.figure(figsize=(5, 3))
     ax=sns.barplot(x=results.index.values,y=results['Score'])
     x=ax.set_title("XGB Model Accuracies for All Tissues")
     x=ax.set_xlabel("Tissues")
     x=ax.set_ylabel("Accuracy Score")
-    x=ax.set_xticklabels(labels=results.index.values,rotation=38)
+    x=ax.set_xticklabels(labels=results.index.values,rotation=38, ha='right')
     plt.show(ax)
     
 if __name__ == "__main__":
@@ -31,7 +31,7 @@ if __name__ == "__main__":
               "sample_meta":"GTEx_v7_Annotations_SampleAttributesDS.txt",
               "subject_meta":"GTEx_v7_Annotations_SubjectPhenotypesDS.txt",
                "merged_meta":"merged_meta.tsv"}
-    meta=pd.read_csv(data_dir/manifest['merged_meta'],sep="\t",dtype={'SMUBRID':object,'SEX':object,'DTHHRDY':object})
+    meta=pd.read_csv(manifest['merged_meta'],sep="\t",dtype={'SMUBRID':object,'SEX':object,'DTHHRDY':object})
     meta=meta[~(meta['AGE'].isnull())]
     counts=pd.DataFrame(meta['SMTS'].value_counts())
     df=meta[meta['SMTS'].isin(counts[counts['SMTS']>200].index)]
