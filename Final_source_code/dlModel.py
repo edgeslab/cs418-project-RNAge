@@ -59,7 +59,7 @@ class keras_model:
         self.model.add(tf.keras.layers.Dense(1024, input_dim=x_train.shape[1], activation=tf.nn.relu))
         self.model.add(tf.keras.layers.Dense(512, activation=tf.nn.relu))
         #self.model.add(tf.keras.layers.Dense(256, activation=tf.nn.relu))
-        #self.model.add(tf.keras.layers.Dense(128, activation=tf.nn.relu))
+        self.model.add(tf.keras.layers.Dense(128, activation=tf.nn.relu))
         self.model.add(tf.keras.layers.Dense(y_train.shape[1], activation=tf.nn.softmax))
         #Note: Output layer is designed to hold the number of neurons equivalent to the number of classes of age groups
 
@@ -159,7 +159,7 @@ keras_model = keras_model.sort_values('tissue_type')
 keras_model.to_csv("keras_model_results.tsv",sep="\t",index=False)
 
 mpl.style.use('default')
-fig = plt.figure(figsize=(8,4))
+fig = plt.figure(figsize=(5,3))
 ax = fig.add_subplot(111)
 
 model_plot = sns.barplot(x = keras_model['tissue_type'],
