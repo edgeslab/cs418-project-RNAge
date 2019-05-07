@@ -9,7 +9,7 @@ import sklearn
 import sklearn.model_selection
 import sklearn.feature_selection
 from os import listdir
-%matplotlib inline
+#%matplotlib inline
 from sklearn.decomposition import PCA
 
 #Setting up the environment and importing the necessary data

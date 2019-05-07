@@ -9,7 +9,6 @@ import sklearn
 import sklearn.model_selection
 import sklearn.feature_selection
 from os import listdir
-%matplotlib inline
 from sklearn.decomposition import PCA
 
 
@@ -24,17 +23,17 @@ manifest={
     "merged_meta":"merged_meta.tsv"}
 
 meta=pd.read_csv(manifest['merged_meta'],sep="\t",dtype={'SMUBRID':object,'SEX':object,'DTHHRDY':object})
-meta
+#meta
 
 meta=meta[~(meta['AGE'].isnull())] # removes all samples without age
 
 counts=pd.DataFrame(meta['SMTS'].value_counts())
-display(counts)
+#display(counts)
 
 
 df=meta[meta['SMTS'].isin(counts[counts['SMTS']>200].index)]
 df=pd.crosstab(index=df['SMTS'],columns=df['AGE'])
-display(df)
+#display(df)
 Tissue_list=df.index
 
 
@@ -48,24 +47,10 @@ def simpleExpressionFilter(counts,min_count):
         """
         keep=np.sum(counts)>min_count
         filtered_counts=counts.loc[:,(keep)] # similar to how the boolean array would be used on any count matrix
-        print("Post",filtered_counts.shape[1])
+        #print("Post",filtered_counts.shape[1])
         return keep
 
-# KNN method for tissue with more than 200 samples
-import random
-#from sklearn.neighbors import KNeighborstClassifier
-infiles=listdir(tissue_dir)
-def simpleExpressionFilter(counts,min_count):
-        """accepts raw counts and a minimum sum count per gene across all samples
-        return a boolean array of all genes, which can be applied to any transformed counts.
-        True is associated with passing the test.
-        """
-        keep=np.sum(counts)>min_count
-        filtered_counts=counts.loc[:,(keep)] # similar to how the boolean array would be used on any count matrix
-        print("Post",filtered_counts.shape[1])
-        return keep
-
-accuracy_knn=[]
+accuracy=[]
 for TISSUE in Tissue_list:
     cpm=pd.read_csv(tissue_dir/str(TISSUE+"_cpm.tsv"),sep="\t",index_col=0)
     #lcpm=pd.read_csv(tissue_dir/str(TISSUE+"_lcpm.tsv"),sep="\t",index_col=0)
@@ -91,7 +76,7 @@ for TISSUE in Tissue_list:
     y=y.values
     pca=PCA(n_components=len(y))
     X=pca.fit_transform(X)
-    X.shape
+    #X.shape
     total_number=len(y)
     train_number=round(0.8*total_number)
     random_vals=random.sample(range(total_number+1), train_number)
@@ -100,7 +85,7 @@ for TISSUE in Tissue_list:
     y_train=y[[i for i in range(0,total_number) if i in random_vals]]
     y_test=y[[i for i in range(0,total_number) if i not in random_vals]]
     #['linear', 'rbf', 'poly', 'sigmoid']
-    init=sklearn.neighbors.KNeighborsClassifier(n_neighbors=6)
+    init=sklearn.svm.classes.SVC(kernel='linear')
     classifier=init.fit(X_train, y_train)
     ev=classifier.predict(X_test)
     ac=0
@@ -111,19 +96,33 @@ for TISSUE in Tissue_list:
             a=1
         ac=ac+a
     ac=1-ac/len(y_test)
-    accuracy_knn.append(ac)
+    accuracy.append(ac)    
 
-    
-### Plotting the accuracy of our model for different tissue
-sns.barplot(Tissue_list, accuracy_knn)
-plt.title('Accuracy of Different Tissues for KNN method')
+
+
+
+SVM_ACCURACY_FILE=pd.DataFrame(columns=['tissue', 'accuracy'])
+SVM_ACCURACY_FILE['tissue']=Tissue_list
+SVM_ACCURACY_FILE['tissue']=Tissue_list
+SVM_ACCURACY_FILE.to_csv('SVM_ACCURACY_FILE.csv')
+
+
+
+
+
+sns.barplot(Tissue_list, accuracy)
+plt.title('Accuracy of Different Tissues for SVM method')
 plt.xlabel('Tissue Type')
 plt.ylabel('Accuracy')
 plt.xticks(rotation=30, ha='right')
-plt.savefig('KNN_Accuracy.png')
+plt.savefig('SVM_Accuracy.png')
+
+plt.show()
+
 
 ### Exporting accuracy data as csv file
 KNN_ACCURACY_FILE=pd.DataFrame(columns=['tissue', 'accuracy'])
 KNN_ACCURACY_FILE['tissue']=Tissue_list
 KNN_ACCURACY_FILE['accuracy']=accuracy_knn
 KNN_ACCURACY_FILE.to_csv('KNN_ACCURACY_FILE.csv')
+
